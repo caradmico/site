@@ -13,11 +13,18 @@ http {
   access_log /dev/stdout heroku;
 
   include mime.types;
-  default_type application/octet-stream;
+  default_type text/plain;  # Changed from octet-stream to prevent binary fallback
+
+  types {
+    text/html html htm;
+    text/css css;
+    application/javascript js;
+  }
+
   sendfile on;
   keepalive_timeout 30;
   gzip on;
-  gzip_types text/html text/plain text/css application/x-javascript text/xml application/xml application/xml+rss text/javascript application/json;
+  gzip_types text/html text/plain text/css application/javascript text/xml application/xml application/xml+rss text/javascript application/json;
 
   server {
     listen <%= ENV["PORT"] %>;
