@@ -27,12 +27,7 @@ http {
     location / {
       root /app/;
       index index.html;
-      try_files $uri $uri/ /index.html;
-      add_header 'Cache-Control' "public, max-age=3600";
-    }
-
-    location = /index.html {
-      add_header Cache-Control "no-store, no-cache";
+      try_files $uri $uri/ /index.html =404;
     }
   }
 }
