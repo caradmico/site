@@ -123,7 +123,7 @@ function animate() {
   const delta = clock.getDelta(); // Seconds since last frame
 
   // Rotate sun and glow slowly
-  const sunRotationSpeed = 0.1; // rad/s for visibility
+  const sunRotationSpeed = 0.01; // rad/s for visibility
   sun.rotation.y += sunRotationSpeed * delta;
   glow.rotation.y += sunRotationSpeed * delta;
 
@@ -133,7 +133,7 @@ function animate() {
     planet.mesh.position.x = planet.distance * Math.cos(planet.initialAngle + omega * clock.getElapsedTime());
     planet.mesh.position.z = planet.distance * Math.sin(planet.initialAngle + omega * clock.getElapsedTime());
     // Optional: Slow self-rotation for planets
-    planet.mesh.rotation.y += 0.0005 * delta;
+    planet.mesh.rotation.y += 0.000005 * delta;
   });
 
   controls.update();
