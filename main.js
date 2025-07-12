@@ -57,7 +57,7 @@ const glowGeometry = new THREE.SphereGeometry(sunRadius * 1.5, 32, 32);
 const glowMaterial = new THREE.MeshBasicMaterial({
   color: 0xffff00,
   transparent: true,
-  opacity: 0.2,
+  opacity: 0.1,
   blending: THREE.AdditiveBlending,
   side: THREE.BackSide
 });
@@ -133,7 +133,7 @@ function animate() {
     planet.mesh.position.x = planet.distance * Math.cos(planet.initialAngle + omega * clock.getElapsedTime());
     planet.mesh.position.z = planet.distance * Math.sin(planet.initialAngle + omega * clock.getElapsedTime());
     // Optional: Slow self-rotation for planets
-    planet.mesh.rotation.y += 0.05 * delta;
+    planet.mesh.rotation.y += 0.005 * delta;
   });
 
   controls.update();
