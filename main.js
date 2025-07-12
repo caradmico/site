@@ -111,6 +111,36 @@ scene.add(stars);
 // Clock for delta time
 const clock = new THREE.Clock();
 
+let followTarget = null; // The mesh to follow and center on
+
+// Keyboard event to select body to center on
+window.addEventListener('keydown', (event) => {
+  const key = event.key;
+  let targetMesh = null;
+  let targetRadius = 0;
+
+  if (key === '0') {
+    targetMesh = sun;
+    targetRadius = sunRadius;
+  } else if (key >= '1' && key <= '8') {
+    const index = parseInt(key) - 1;
+    if (index < planets.length) {
+      targetMesh = planets[index].mesh;
+      targetRadius = planets[index].radius;
+    }
+  }
+
+  if (targetMesh) {
+    followTarget = targetMesh;
+    // Move camera to a viewing position offset from the target
+    const viewDist = targetRadius * 2 + 20; // Adjustable viewing distance
+    const offset = new THREE.Vector3(0, 0, viewDist);
+    controls.target.copy(targetMesh.position);
+    camera.position.copy(controls.target.clone().add(offset));
+    controls.update();
+  }
+});
+
 // Handle window resize
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
@@ -135,6 +165,11 @@ function animate() {
     // Optional: Slow self-rotation for planets
     planet.mesh.rotation.y += 0.000005 * delta;
   });
+
+  // If following a target, update the controls target to its current position
+  if (followTarget) {
+    controls.target.copy(followTarget.position);
+  }
 
   controls.update();
   renderer.render(scene, camera);
