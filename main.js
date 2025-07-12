@@ -32,7 +32,7 @@ const planetsData = [
 
 const distanceScale = 50; // Units per AU to ensure planets are outside sun and visible
 const sunRadius = 10; // 10x larger than original for visibility
-const speedup = 10; // Approx factor to make change speed
+const speedup = 10000000; // Approx factor to make change speed
 
 // Create sun
 const sunTexture = loader.load('./textures/8k_sun.jpg');
