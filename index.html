@@ -3,89 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Yellow Ball</title>
-    <style>
-        body { margin: 0; }
-        canvas { display: block; }
-        #error-message { color: red; font-size: 20px; text-align: center; margin-top: 20px; display: none; }
-    </style>
+    <title>Three.js Yellow Sphere</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="error-message">Failed to load Three.js library or WebGL is not supported. Please check your internet connection, browser compatibility, or try a different browser.</div>
-    <script>
-        function tryFallback() {
-            console.log('Primary CDN failed, trying fallback...');
-            const script = document.createElement('script');
-            script.src = 'https://unpkg.com/three@0.162.0/build/three.min.js'; // Fallback CDN
-            script.onload = init;
-            script.onerror = () => {
-                console.error('Fallback CDN also failed.');
-                showError();
-            };
-            document.body.appendChild(script);
-        }
-
-        function showError() {
-            document.getElementById('error-message').style.display = 'block';
-        }
-
-        function init() {
-            if (!window.THREE) {
-                console.error('Three.js is not defined.');
-                showError();
-                return;
-            }
-
-            if (!window.WebGLRenderingContext || !document.createElement('canvas').getContext('webgl')) {
-                console.error('WebGL is not supported.');
-                showError();
-                return;
-            }
-
-            const scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x000000);
-
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 5;
-
-            const renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            document.body.appendChild(renderer.domElement);
-
-            const geometry = new THREE.SphereGeometry(1, 32, 32);
-            const material = new THREE.MeshPhongMaterial({ color: 0xffff00 });
-            const sphere = new THREE.Mesh(geometry, material);
-            scene.add(sphere);
-
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-            scene.add(ambientLight);
-
-            const light = new THREE.PointLight(0xffffff, 2, 100);
-            light.position.set(5, 5, 5);
-            scene.add(light);
-
-            function animate() {
-                requestAnimationFrame(animate);
-                sphere.rotation.x += 0.01;
-                sphere.rotation.y += 0.01;
-                renderer.render(scene, camera);
-            }
-
-            animate();
-
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-        }
-
-        // Dynamically load Three.js after functions are defined
-        const threeScript = document.createElement('script');
-        threeScript.src = 'https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.min.js';
-        threeScript.onload = init;
-        threeScript.onerror = tryFallback;
-        document.body.appendChild(threeScript);
-    </script>
+    <canvas id="canvas"></canvas>
+    <script type="module" src="main.js"></script>
 </body>
 </html>
