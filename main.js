@@ -20,14 +20,14 @@ const loader = new THREE.TextureLoader();
 
 // Planets data with semi-major axes (distance in AU), visual radii (not to scale), textures, and initial angles from July 12, 2025 positions
 const planetsData = [
-  { name: 'mercury', distance: 0.387, radius: 0.5, texturePath: './textures/2k_mercury.jpg', initialAngle: Math.atan2(-0.39360647687959077, -0.15617905102240556) },
-  { name: 'venus', distance: 0.723, radius: 1, texturePath: './textures/2k_venus_surface.jpg', initialAngle: Math.atan2(0.0038495805009816936, 0.7252778270399232) },
-  { name: 'earth', distance: 1.0, radius: 1.2, texturePath: './textures/2k_earth_daymap.jpg', initialAngle: Math.atan2(-0.8787777356810902, 0.3404893717576449) },
-  { name: 'mars', distance: 1.524, radius: 0.8, texturePath: './textures/2k_mars.jpg', initialAngle: Math.atan2(-0.3810775835484354, -1.5794890330124596) },
-  { name: 'jupiter', distance: 5.203, radius: 3, texturePath: './textures/2k_jupiter.jpg', initialAngle: Math.atan2(4.714503915866097, -0.402812960921938) },
-  { name: 'saturn', distance: 9.537, radius: 2.5, texturePath: './textures/2k_saturn.jpg', initialAngle: Math.atan2(-0.5010083118219353, 9.538669032672617) },
-  { name: 'uranus', distance: 19.191, radius: 2, texturePath: './textures/2k_uranus.jpg', initialAngle: Math.atan2(15.145688517082386, 10.467032049592055) },
-  { name: 'neptune', distance: 30.069, radius: 2, texturePath: './textures/2k_neptune.jpg', initialAngle: Math.atan2(0.24889225814952515, 29.881968387607646) }
+  { name: 'mercury', distance: 0.387, radius: 0.5, texturePath: './textures/8k_mercury.jpg', initialAngle: Math.atan2(-0.39360647687959077, -0.15617905102240556) },
+  { name: 'venus', distance: 0.723, radius: 1, texturePath: './textures/8k_venus_surface.jpg', initialAngle: Math.atan2(0.0038495805009816936, 0.7252778270399232) },
+  { name: 'earth', distance: 1.0, radius: 1.2, texturePath: './textures/8k_earth_daymap.jpg', initialAngle: Math.atan2(-0.8787777356810902, 0.3404893717576449) },
+  { name: 'mars', distance: 1.524, radius: 0.8, texturePath: './textures/8k_mars.jpg', initialAngle: Math.atan2(-0.3810775835484354, -1.5794890330124596) },
+  { name: 'jupiter', distance: 5.203, radius: 3, texturePath: './textures/8k_jupiter.jpg', initialAngle: Math.atan2(4.714503915866097, -0.402812960921938) },
+  { name: 'saturn', distance: 9.537, radius: 2.5, texturePath: './textures/8k_saturn.jpg', initialAngle: Math.atan2(-0.5010083118219353, 9.538669032672617) },
+  { name: 'uranus', distance: 19.191, radius: 2, texturePath: './textures/8k_uranus.jpg', initialAngle: Math.atan2(15.145688517082386, 10.467032049592055) },
+  { name: 'neptune', distance: 30.069, radius: 2, texturePath: './textures/8k_neptune.jpg', initialAngle: Math.atan2(0.24889225814952515, 29.881968387607646) }
 ];
 
 const distanceScale = 300; // Units per AU to ensure planets are outside sun and visible
