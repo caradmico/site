@@ -44,20 +44,20 @@
         const stars = new THREE.Points(starsGeometry, starsMaterial);
         scene.add(stars);
 
-        // Orbs
+        // Orbs (Planets)
         const orbs = [];
         const links = [
-            { url: 'https://github.com/yourusername', position: new THREE.Vector3(0, 0, -20), color: 0x00ff00 },
-            { url: 'https://linkedin.com/in/yourusername', position: new THREE.Vector3(10, 5, -30), color: 0x0000ff },
-            { url: 'https://yourportfolio.com/project1', position: new THREE.Vector3(-15, -10, -25), color: 0xff0000 },
-            { url: 'https://yourportfolio.com/project2', position: new THREE.Vector3(20, 15, -40), color: 0xffff00 },
+            { url: 'https://github.com/yourusername', position: new THREE.Vector3(0, 0, -20), color: 0x00ff00, radius: 5, speed: 0.01, angle: 0 },
+            { url: 'https://linkedin.com/in/yourusername', position: new THREE.Vector3(10, 5, -30), color: 0x0000ff, radius: 4, speed: 0.015, angle: Math.PI / 2 },
+            { url: 'https://yourportfolio.com/project1', position: new THREE.Vector3(-15, -10, -25), color: 0xff0000, radius: 6, speed: 0.008, angle: Math.PI },
+            { url: 'https://yourportfolio.com/project2', position: new THREE.Vector3(20, 15, -40), color: 0xffff00, radius: 3, speed: 0.02, angle: 3 * Math.PI / 2 },
         ];
         links.forEach(link => {
-            const geometry = new THREE.SphereGeometry(1, 32, 32);
+            const geometry = new THREE.SphereGeometry(1, 32, 32); // Base size, scaled later
             const material = new THREE.MeshBasicMaterial({ color: link.color });
             const orb = new THREE.Mesh(geometry, material);
             orb.position.copy(link.position);
-            orb.userData = { url: link.url, originalColor: link.color, originalScale: new THREE.Vector3(1,1,1) };
+            orb.userData = { url: link.url, originalColor: link.color, originalScale: new THREE.Vector3(1, 1, 1), radius: link.radius, speed: link.speed, angle: link.angle };
             scene.add(orb);
             orbs.push(orb);
 
@@ -67,20 +67,16 @@
             scene.add(pointLight);
         });
 
-        camera.position.z = 5;
+        camera.position.set(0, 0, 50); // Move camera back to see the scene
 
         // Raycaster and mouse
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
         let currentHovered = null;
-
-        // Movement variables
-        let moveForward = false;
-        let moveBackward = false;
-        let moveLeft = false;
-        let moveRight = false;
         let isDragging = false;
         let previousMousePosition = { x: 0, y: 0 };
+        let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
+        let freeLookActive = false;
 
         // Event listeners
         window.addEventListener('resize', () => {
@@ -113,38 +109,14 @@
         });
 
         renderer.domElement.addEventListener('mousemove', (event) => {
-            if (isDragging) {
-                const deltaX = event.clientX - previousMousePosition.x;
-                const deltaY = event.clientY - previousMousePosition.y;
-                camera.rotation.y -= deltaX * 0.005;
-                camera.rotation.x -= deltaY * 0.005;
-                previousMousePosition = { x: event.clientX, y: event.clientY };
-            } else {
-                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-                mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
-                raycaster.setFromCamera(mouse, camera);
-                const intersects = raycaster.intersectObjects(orbs);
-                if (intersects.length > 0) {
-                    const orb = intersects[0].object;
-                    if (currentHovered !== orb) {
-                        if (currentHovered) {
-                            resetOrb(currentHovered);
-                        }
-                        highlightOrb(orb);
-                        currentHovered = orb;
-                    }
-                } else if (currentHovered) {
-                    resetOrb(currentHovered);
-                    currentHovered = null;
-                }
-            }
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
         });
 
         renderer.domElement.addEventListener('mouseup', () => {
             isDragging = false;
         });
 
-        // Touch events
         renderer.domElement.addEventListener('touchstart', (event) => {
             if (event.touches.length === 1) {
                 isDragging = true;
@@ -154,10 +126,6 @@
 
         renderer.domElement.addEventListener('touchmove', (event) => {
             if (isDragging && event.touches.length === 1) {
-                const deltaX = event.touches[0].clientX - previousMousePosition.x;
-                const deltaY = event.touches[0].clientY - previousMousePosition.y;
-                camera.rotation.y -= deltaX * 0.005;
-                camera.rotation.x -= deltaY * 0.005;
                 previousMousePosition = { x: event.touches[0].clientX, y: event.touches[0].clientY };
             }
         });
@@ -166,10 +134,7 @@
             isDragging = false;
         });
 
-        // Click to focus
         renderer.domElement.addEventListener('click', (event) => {
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
             const intersects = raycaster.intersectObjects(orbs);
             if (intersects.length > 0) {
@@ -178,10 +143,7 @@
             }
         });
 
-        // Double click to open link
         renderer.domElement.addEventListener('dblclick', (event) => {
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
             const intersects = raycaster.intersectObjects(orbs);
             if (intersects.length > 0) {
@@ -190,25 +152,12 @@
             }
         });
 
-        // Pointer lock for navigation mode
         document.getElementById('nav-button').addEventListener('click', () => {
             renderer.domElement.requestPointerLock();
         });
 
-        let freeLookActive = false;
         document.addEventListener('pointerlockchange', () => {
-            if (document.pointerLockElement === renderer.domElement) {
-                freeLookActive = true;
-            } else {
-                freeLookActive = false;
-            }
-        });
-
-        renderer.domElement.addEventListener('mousemove', (event) => {
-            if (freeLookActive) {
-                camera.rotation.y -= event.movementX * 0.002;
-                camera.rotation.x -= event.movementY * 0.002;
-            }
+            freeLookActive = document.pointerLockElement === renderer.domElement;
         });
 
         function highlightOrb(orb) {
@@ -226,15 +175,12 @@
             const orbPos = orb.position.clone();
             const direction = orbPos.sub(startPosition).normalize();
             const distance = startPosition.distanceTo(orbPos) - 3;
-            if (distance < 0) return; // already close
+            if (distance < 0) return;
             const endPosition = startPosition.clone().add(direction.multiplyScalar(distance));
-
-            // Compute end quaternion
             const tempCamera = camera.clone();
             tempCamera.position.copy(endPosition);
             tempCamera.lookAt(orbPos);
             const endQuaternion = tempCamera.quaternion.clone();
-
             const startQuaternion = camera.quaternion.clone();
             const startTime = performance.now();
             const duration = 2000;
@@ -245,15 +191,38 @@
                 if (progress > 1) progress = 1;
                 camera.position.lerpVectors(startPosition, endPosition, progress);
                 camera.quaternion.slerp(endQuaternion, progress);
-                if (progress < 1) {
-                    requestAnimationFrame(step);
-                }
+                if (progress < 1) requestAnimationFrame(step);
             }
             requestAnimationFrame(step);
         }
 
         function animate() {
             requestAnimationFrame(animate);
+
+            // Update orb positions for orbit
+            const time = performance.now() * 0.001;
+            orbs.forEach(orb => {
+                const data = orb.userData;
+                data.angle += data.speed;
+                orb.position.x = data.position.x + Math.cos(data.angle) * data.radius;
+                orb.position.z = data.position.z + Math.sin(data.angle) * data.radius;
+                orb.updateMatrixWorld(); // Ensure position updates for raycasting
+            });
+
+            // Raycasting for hover
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(orbs);
+            if (intersects.length > 0) {
+                const orb = intersects[0].object;
+                if (currentHovered !== orb) {
+                    if (currentHovered) resetOrb(currentHovered);
+                    highlightOrb(orb);
+                    currentHovered = orb;
+                }
+            } else if (currentHovered) {
+                resetOrb(currentHovered);
+                currentHovered = null;
+            }
 
             // Movement
             const speed = 0.5;
@@ -264,6 +233,21 @@
             const right = new THREE.Vector3().crossVectors(camera.up, direction).normalize();
             if (moveLeft) camera.position.addScaledVector(right, -speed);
             if (moveRight) camera.position.addScaledVector(right, speed);
+
+            // Drag rotation
+            if (isDragging) {
+                const deltaX = mouse.x * window.innerWidth - previousMousePosition.x;
+                const deltaY = mouse.y * window.innerHeight - previousMousePosition.y;
+                camera.rotation.y -= deltaX * 0.005;
+                camera.rotation.x -= deltaY * 0.005;
+                previousMousePosition = { x: mouse.x * window.innerWidth, y: mouse.y * window.innerHeight };
+            }
+
+            // Free look
+            if (freeLookActive) {
+                camera.rotation.y -= mouse.x * 0.002;
+                camera.rotation.x -= mouse.y * 0.002;
+            }
 
             renderer.render(scene, camera);
         }
