@@ -3,256 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Space Portfolio</title>
+    <title>3D Space</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/three@0.178.0/build/three.min.js"></script>
 </head>
 <body>
     <canvas id="canvas"></canvas>
-    <div class="contact-form">
-        <h2>Contact Me</h2>
-        <form action="mailto:your.email@example.com" method="post" enctype="text/plain">
-            <label for="name">Name:</label>
-            <input type="text" id="name" name="name" required>
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
-            <label for="message">Message:</label>
-            <textarea id="message" name="message" required></textarea>
-            <input type="submit" value="Send">
-        </form>
-    </div>
-    <button id="nav-button">Activate Navigation Mode</button>
-
     <script>
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000);
-        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas') });
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas'), alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setClearColor(0x000000, 1); // Black background
 
-        // Stars
-        const starsGeometry = new THREE.BufferGeometry();
-        const starsMaterial = new THREE.PointsMaterial({ color: 0xFFFFFF, size: 0.05 });
-        const starsVertices = [];
-        for (let i = 0; i < 20000; i++) {
-            const x = (Math.random() - 0.5) * 2000;
-            const y = (Math.random() - 0.5) * 2000;
-            const z = (Math.random() - 0.5) * 2000;
-            starsVertices.push(x, y, z);
+        const geometry = new THREE.SphereGeometry(5, 32, 32);
+        const material = new THREE.MeshBasicMaterial({ color: 0xffff00 }); // Yellow ball
+        const sphere = new THREE.Mesh(geometry, material);
+        scene.add(sphere);
+
+        camera.position.z = 15;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
         }
-        starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starsVertices, 3));
-        const stars = new THREE.Points(starsGeometry, starsMaterial);
-        scene.add(stars);
+        animate();
 
-        // Orbs (Planets)
-        const orbs = [];
-        const links = [
-            { url: 'https://github.com/yourusername', position: new THREE.Vector3(0, 0, -20), color: 0x00ff00, radius: 5, speed: 0.01, angle: 0 },
-            { url: 'https://linkedin.com/in/yourusername', position: new THREE.Vector3(10, 5, -30), color: 0x0000ff, radius: 4, speed: 0.015, angle: Math.PI / 2 },
-            { url: 'https://yourportfolio.com/project1', position: new THREE.Vector3(-15, -10, -25), color: 0xff0000, radius: 6, speed: 0.008, angle: Math.PI },
-            { url: 'https://yourportfolio.com/project2', position: new THREE.Vector3(20, 15, -40), color: 0xffff00, radius: 3, speed: 0.02, angle: 3 * Math.PI / 2 },
-        ];
-        links.forEach(link => {
-            const geometry = new THREE.SphereGeometry(1, 32, 32); // Base size, scaled later
-            const material = new THREE.MeshBasicMaterial({ color: link.color });
-            const orb = new THREE.Mesh(geometry, material);
-            orb.position.copy(link.position);
-            orb.userData = { url: link.url, originalColor: link.color, originalScale: new THREE.Vector3(1, 1, 1), radius: link.radius, speed: link.speed, angle: link.angle };
-            scene.add(orb);
-            orbs.push(orb);
-
-            // Point light for glow
-            const pointLight = new THREE.PointLight(link.color, 2, 50);
-            pointLight.position.copy(link.position);
-            scene.add(pointLight);
-        });
-
-        camera.position.set(0, 0, 50); // Move camera back to see the scene
-
-        // Raycaster and mouse
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
-        let currentHovered = null;
-        let isDragging = false;
-        let previousMousePosition = { x: 0, y: 0 };
-        let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
-        let freeLookActive = false;
-
-        // Event listeners
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
-
-        document.addEventListener('keydown', (event) => {
-            switch (event.key.toLowerCase()) {
-                case 'w': moveForward = true; break;
-                case 's': moveBackward = true; break;
-                case 'a': moveLeft = true; break;
-                case 'd': moveRight = true; break;
-            }
-        });
-
-        document.addEventListener('keyup', (event) => {
-            switch (event.key.toLowerCase()) {
-                case 'w': moveForward = false; break;
-                case 's': moveBackward = false; break;
-                case 'a': moveLeft = false; break;
-                case 'd': moveRight = false; break;
-            }
-        });
-
-        renderer.domElement.addEventListener('mousedown', (event) => {
-            isDragging = true;
-            previousMousePosition = { x: event.clientX, y: event.clientY };
-        });
-
-        renderer.domElement.addEventListener('mousemove', (event) => {
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
-        });
-
-        renderer.domElement.addEventListener('mouseup', () => {
-            isDragging = false;
-        });
-
-        renderer.domElement.addEventListener('touchstart', (event) => {
-            if (event.touches.length === 1) {
-                isDragging = true;
-                previousMousePosition = { x: event.touches[0].clientX, y: event.touches[0].clientY };
-            }
-        });
-
-        renderer.domElement.addEventListener('touchmove', (event) => {
-            if (isDragging && event.touches.length === 1) {
-                previousMousePosition = { x: event.touches[0].clientX, y: event.touches[0].clientY };
-            }
-        });
-
-        renderer.domElement.addEventListener('touchend', () => {
-            isDragging = false;
-        });
-
-        renderer.domElement.addEventListener('click', (event) => {
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(orbs);
-            if (intersects.length > 0) {
-                const orb = intersects[0].object;
-                animateToOrb(orb);
-            }
-        });
-
-        renderer.domElement.addEventListener('dblclick', (event) => {
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(orbs);
-            if (intersects.length > 0) {
-                const orb = intersects[0].object;
-                window.open(orb.userData.url, '_blank');
-            }
-        });
-
-        document.getElementById('nav-button').addEventListener('click', () => {
-            renderer.domElement.requestPointerLock();
-        });
-
-        document.addEventListener('pointerlockchange', () => {
-            freeLookActive = document.pointerLockElement === renderer.domElement;
-        });
-
-        function highlightOrb(orb) {
-            orb.material.color.set(0xffffff);
-            orb.scale.set(1.2, 1.2, 1.2);
-        }
-
-        function resetOrb(orb) {
-            orb.material.color.set(orb.userData.originalColor);
-            orb.scale.copy(orb.userData.originalScale);
-        }
-
-        function animateToOrb(orb) {
-            const startPosition = camera.position.clone();
-            const orbPos = orb.position.clone();
-            const direction = orbPos.sub(startPosition).normalize();
-            const distance = startPosition.distanceTo(orbPos) - 3;
-            if (distance < 0) return;
-            const endPosition = startPosition.clone().add(direction.multiplyScalar(distance));
-            const tempCamera = camera.clone();
-            tempCamera.position.copy(endPosition);
-            tempCamera.lookAt(orbPos);
-            const endQuaternion = tempCamera.quaternion.clone();
-            const startQuaternion = camera.quaternion.clone();
-            const startTime = performance.now();
-            const duration = 2000;
-
-            function step(currentTime) {
-                const elapsed = currentTime - startTime;
-                let progress = elapsed / duration;
-                if (progress > 1) progress = 1;
-                camera.position.lerpVectors(startPosition, endPosition, progress);
-                camera.quaternion.slerp(endQuaternion, progress);
-                if (progress < 1) requestAnimationFrame(step);
-            }
-            requestAnimationFrame(step);
-        }
-
-        function animate() {
-            requestAnimationFrame(animate);
-
-            // Update orb positions for orbit
-            const time = performance.now() * 0.001;
-            orbs.forEach(orb => {
-                const data = orb.userData;
-                data.angle += data.speed;
-                orb.position.x = data.position.x + Math.cos(data.angle) * data.radius;
-                orb.position.z = data.position.z + Math.sin(data.angle) * data.radius;
-                orb.updateMatrixWorld(); // Ensure position updates for raycasting
-            });
-
-            // Raycasting for hover
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(orbs);
-            if (intersects.length > 0) {
-                const orb = intersects[0].object;
-                if (currentHovered !== orb) {
-                    if (currentHovered) resetOrb(currentHovered);
-                    highlightOrb(orb);
-                    currentHovered = orb;
-                }
-            } else if (currentHovered) {
-                resetOrb(currentHovered);
-                currentHovered = null;
-            }
-
-            // Movement
-            const speed = 0.5;
-            const direction = new THREE.Vector3();
-            camera.getWorldDirection(direction);
-            if (moveForward) camera.position.addScaledVector(direction, speed);
-            if (moveBackward) camera.position.addScaledVector(direction, -speed);
-            const right = new THREE.Vector3().crossVectors(camera.up, direction).normalize();
-            if (moveLeft) camera.position.addScaledVector(right, -speed);
-            if (moveRight) camera.position.addScaledVector(right, speed);
-
-            // Drag rotation
-            if (isDragging) {
-                const deltaX = mouse.x * window.innerWidth - previousMousePosition.x;
-                const deltaY = mouse.y * window.innerHeight - previousMousePosition.y;
-                camera.rotation.y -= deltaX * 0.005;
-                camera.rotation.x -= deltaY * 0.005;
-                previousMousePosition = { x: mouse.x * window.innerWidth, y: mouse.y * window.innerHeight };
-            }
-
-            // Free look
-            if (freeLookActive) {
-                camera.rotation.y -= mouse.x * 0.002;
-                camera.rotation.x -= mouse.y * 0.002;
-            }
-
-            renderer.render(scene, camera);
-        }
-
-        animate();
     </script>
 </body>
 </html>
