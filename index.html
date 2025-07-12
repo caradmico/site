@@ -1,68 +1,29 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Space Portfolio</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/three@0.178.0/build/three.min.js"></script>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <div class="contact-form">
+        <h2>Contact Me</h2>
+        <form action="mailto:your.email@example.com" method="post" enctype="text/plain">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+            <label for="message">Message:</label>
+            <textarea id="message" name="message" required></textarea>
+            <input type="submit" value="Send">
+        </form>
+    </div>
+    <button id="nav-button">Activate Navigation Mode</button>
 
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script>&lt;!DOCTYPE html&gt;
-&lt;html lang=&quot;en&quot;&gt;
-&lt;head&gt;
-    &lt;meta charset=&quot;UTF-8&quot;&gt;
-    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
-    &lt;title&gt;3D Space Portfolio&lt;/title&gt;
-    &lt;link rel=&quot;stylesheet&quot; href=&quot;styles.css&quot;&gt;
-    &lt;script src=&quot;https://cdn.jsdelivr.net/npm/three@0.178.0/build/three.min.js&quot;&gt;&lt;/script&gt;
-&lt;/head&gt;
-&lt;body&gt;
-    &lt;canvas id=&quot;canvas&quot;&gt;&lt;/canvas&gt;
-    &lt;div class=&quot;contact-form&quot;&gt;
-        &lt;h2&gt;Contact Me&lt;/h2&gt;
-        &lt;form action=&quot;mailto:your.email@example.com&quot; method=&quot;post&quot; enctype=&quot;text/plain&quot;&gt;
-            &lt;label for=&quot;name&quot;&gt;Name:&lt;/label&gt;
-            &lt;input type=&quot;text&quot; id=&quot;name&quot; name=&quot;name&quot; required&gt;
-            &lt;label for=&quot;email&quot;&gt;Email:&lt;/label&gt;
-            &lt;input type=&quot;email&quot; id=&quot;email&quot; name=&quot;email&quot; required&gt;
-            &lt;label for=&quot;message&quot;&gt;Message:&lt;/label&gt;
-            &lt;textarea id=&quot;message&quot; name=&quot;message&quot; required&gt;&lt;/textarea&gt;
-            &lt;input type=&quot;submit&quot; value=&quot;Send&quot;&gt;
-        &lt;/form&gt;
-    &lt;/div&gt;
-    &lt;button id=&quot;nav-button&quot;&gt;Activate Navigation Mode&lt;/button&gt;
-
-    &lt;script&gt;
+    <script>
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000);
         const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas') });
@@ -73,7 +34,7 @@
         const starsGeometry = new THREE.BufferGeometry();
         const starsMaterial = new THREE.PointsMaterial({ color: 0xFFFFFF, size: 0.05 });
         const starsVertices = [];
-        for (let i = 0; i &lt; 20000; i++) {
+        for (let i = 0; i < 20000; i++) {
             const x = (Math.random() - 0.5) * 2000;
             const y = (Math.random() - 0.5) * 2000;
             const z = (Math.random() - 0.5) * 2000;
@@ -91,7 +52,7 @@
             { url: 'https://yourportfolio.com/project1', position: new THREE.Vector3(-15, -10, -25), color: 0xff0000 },
             { url: 'https://yourportfolio.com/project2', position: new THREE.Vector3(20, 15, -40), color: 0xffff00 },
         ];
-        links.forEach(link =&gt; {
+        links.forEach(link => {
             const geometry = new THREE.SphereGeometry(1, 32, 32);
             const material = new THREE.MeshBasicMaterial({ color: link.color });
             const orb = new THREE.Mesh(geometry, material);
@@ -122,13 +83,13 @@
         let previousMousePosition = { x: 0, y: 0 };
 
         // Event listeners
-        window.addEventListener('resize', () =&gt; {
+        window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        document.addEventListener('keydown', (event) =&gt; {
+        document.addEventListener('keydown', (event) => {
             switch (event.key.toLowerCase()) {
                 case 'w': moveForward = true; break;
                 case 's': moveBackward = true; break;
@@ -137,7 +98,7 @@
             }
         });
 
-        document.addEventListener('keyup', (event) =&gt; {
+        document.addEventListener('keyup', (event) => {
             switch (event.key.toLowerCase()) {
                 case 'w': moveForward = false; break;
                 case 's': moveBackward = false; break;
@@ -146,12 +107,12 @@
             }
         });
 
-        renderer.domElement.addEventListener('mousedown', (event) =&gt; {
+        renderer.domElement.addEventListener('mousedown', (event) => {
             isDragging = true;
             previousMousePosition = { x: event.clientX, y: event.clientY };
         });
 
-        renderer.domElement.addEventListener('mousemove', (event) =&gt; {
+        renderer.domElement.addEventListener('mousemove', (event) => {
             if (isDragging) {
                 const deltaX = event.clientX - previousMousePosition.x;
                 const deltaY = event.clientY - previousMousePosition.y;
@@ -163,7 +124,7 @@
                 mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
                 raycaster.setFromCamera(mouse, camera);
                 const intersects = raycaster.intersectObjects(orbs);
-                if (intersects.length &gt; 0) {
+                if (intersects.length > 0) {
                     const orb = intersects[0].object;
                     if (currentHovered !== orb) {
                         if (currentHovered) {
@@ -179,20 +140,20 @@
             }
         });
 
-        renderer.domElement.addEventListener('mouseup', () =&gt; {
+        renderer.domElement.addEventListener('mouseup', () => {
             isDragging = false;
         });
 
         // Touch events
-        renderer.domElement.addEventListener('touchstart', (event) =&gt; {
+        renderer.domElement.addEventListener('touchstart', (event) => {
             if (event.touches.length === 1) {
                 isDragging = true;
                 previousMousePosition = { x: event.touches[0].clientX, y: event.touches[0].clientY };
             }
         });
 
-        renderer.domElement.addEventListener('touchmove', (event) =&gt; {
-            if (isDragging &amp;&amp; event.touches.length === 1) {
+        renderer.domElement.addEventListener('touchmove', (event) => {
+            if (isDragging && event.touches.length === 1) {
                 const deltaX = event.touches[0].clientX - previousMousePosition.x;
                 const deltaY = event.touches[0].clientY - previousMousePosition.y;
                 camera.rotation.y -= deltaX * 0.005;
@@ -201,41 +162,41 @@
             }
         });
 
-        renderer.domElement.addEventListener('touchend', () =&gt; {
+        renderer.domElement.addEventListener('touchend', () => {
             isDragging = false;
         });
 
         // Click to focus
-        renderer.domElement.addEventListener('click', (event) =&gt; {
+        renderer.domElement.addEventListener('click', (event) => {
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
             const intersects = raycaster.intersectObjects(orbs);
-            if (intersects.length &gt; 0) {
+            if (intersects.length > 0) {
                 const orb = intersects[0].object;
                 animateToOrb(orb);
             }
         });
 
         // Double click to open link
-        renderer.domElement.addEventListener('dblclick', (event) =&gt; {
+        renderer.domElement.addEventListener('dblclick', (event) => {
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
             const intersects = raycaster.intersectObjects(orbs);
-            if (intersects.length &gt; 0) {
+            if (intersects.length > 0) {
                 const orb = intersects[0].object;
                 window.open(orb.userData.url, '_blank');
             }
         });
 
         // Pointer lock for navigation mode
-        document.getElementById('nav-button').addEventListener('click', () =&gt; {
+        document.getElementById('nav-button').addEventListener('click', () => {
             renderer.domElement.requestPointerLock();
         });
 
         let freeLookActive = false;
-        document.addEventListener('pointerlockchange', () =&gt; {
+        document.addEventListener('pointerlockchange', () => {
             if (document.pointerLockElement === renderer.domElement) {
                 freeLookActive = true;
             } else {
@@ -243,7 +204,7 @@
             }
         });
 
-        renderer.domElement.addEventListener('mousemove', (event) =&gt; {
+        renderer.domElement.addEventListener('mousemove', (event) => {
             if (freeLookActive) {
                 camera.rotation.y -= event.movementX * 0.002;
                 camera.rotation.x -= event.movementY * 0.002;
@@ -265,7 +226,7 @@
             const orbPos = orb.position.clone();
             const direction = orbPos.sub(startPosition).normalize();
             const distance = startPosition.distanceTo(orbPos) - 3;
-            if (distance &lt; 0) return; // already close
+            if (distance < 0) return; // already close
             const endPosition = startPosition.clone().add(direction.multiplyScalar(distance));
 
             // Compute end quaternion
@@ -281,10 +242,10 @@
             function step(currentTime) {
                 const elapsed = currentTime - startTime;
                 let progress = elapsed / duration;
-                if (progress &gt; 1) progress = 1;
+                if (progress > 1) progress = 1;
                 camera.position.lerpVectors(startPosition, endPosition, progress);
                 camera.quaternion.slerp(endQuaternion, progress);
-                if (progress &lt; 1) {
+                if (progress < 1) {
                     requestAnimationFrame(step);
                 }
             }
@@ -308,6 +269,6 @@
         }
 
         animate();
-    &lt;/script&gt;
-&lt;/body&gt;
-&lt;/html&gt;
+    </script>
+</body>
+</html>
