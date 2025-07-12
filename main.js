@@ -30,9 +30,9 @@ const planetsData = [
   { name: 'neptune', distance: 30.069, radius: 2, texturePath: './textures/2k_neptune.jpg', initialAngle: Math.atan2(0.24889225814952515, 29.881968387607646) }
 ];
 
-const distanceScale = 30; // Units per AU to ensure planets are outside sun and visible
+const distanceScale = 300; // Units per AU to ensure planets are outside sun and visible
 const sunRadius = 10; // 10x larger than original for visibility
-const speedup = 1000; // Approx factor to make change speed
+const speedup = 100; // Approx factor to make change speed
 
 // Create sun
 const sunTexture = loader.load('./textures/8k_sun.jpg');
