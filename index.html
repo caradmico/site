@@ -12,12 +12,11 @@
 </head>
 <body>
     <div id="error-message">Failed to load Three.js library or WebGL is not supported. Please check your internet connection, browser compatibility, or try a different browser.</div>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.min.js" onload="init()" onerror="tryFallback()"></script>
     <script>
         function tryFallback() {
             console.log('Primary CDN failed, trying fallback...');
             const script = document.createElement('script');
-            script.src = 'https://unpkg.com/three@0.162.0/build/three.min.js';
+            script.src = 'https://unpkg.com/three@0.162.0/build/three.min.js'; // Fallback CDN
             script.onload = init;
             script.onerror = () => {
                 console.error('Fallback CDN also failed.');
@@ -80,6 +79,13 @@
                 renderer.setSize(window.innerWidth, window.innerHeight);
             });
         }
+
+        // Dynamically load Three.js after functions are defined
+        const threeScript = document.createElement('script');
+        threeScript.src = 'https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.min.js';
+        threeScript.onload = init;
+        threeScript.onerror = tryFallback;
+        document.body.appendChild(threeScript);
     </script>
 </body>
 </html>
