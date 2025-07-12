@@ -11,48 +11,62 @@
     </style>
 </head>
 <body>
-    <div id="error-message">Failed to load Three.js library. Please check your internet connection or try a different browser.</div>
-    <script src="https://unpkg.com/three@0.162.0/build/three.min.js" onload="init()" onerror="showError()"></script>
+    <div id="error-message">Failed to load Three.js library or WebGL is not supported. Please check your internet connection, browser compatibility, or try a different browser.</div>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.min.js" onload="init()" onerror="tryFallback()"></script>
     <script>
+        function tryFallback() {
+            console.log('Primary CDN failed, trying fallback...');
+            const script = document.createElement('script');
+            script.src = 'https://unpkg.com/three@0.162.0/build/three.min.js';
+            script.onload = init;
+            script.onerror = () => {
+                console.error('Fallback CDN also failed.');
+                showError();
+            };
+            document.body.appendChild(script);
+        }
+
         function showError() {
             document.getElementById('error-message').style.display = 'block';
         }
 
         function init() {
-            // Create the scene
+            if (!window.THREE) {
+                console.error('Three.js is not defined.');
+                showError();
+                return;
+            }
+
+            if (!window.WebGLRenderingContext || !document.createElement('canvas').getContext('webgl')) {
+                console.error('WebGL is not supported.');
+                showError();
+                return;
+            }
+
             const scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x000000); // Black background
+            scene.background = new THREE.Color(0x000000);
 
-            // Create the camera
             const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 5; // Position the camera to view the ball
+            camera.position.z = 5;
 
-            // Create the renderer
-            const renderer = new THREE.WebGLRenderer();
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.body.appendChild(renderer.domElement);
 
-            // Create the sphere geometry and material
-            const geometry = new THREE.SphereGeometry(1, 32, 32); // Radius 1, with sufficient segments for smoothness
-            const material = new THREE.MeshPhongMaterial({ color: 0xffff00 }); // Yellow color with Phong shading for 3D effect
-
-            // Create the mesh and add to scene
+            const geometry = new THREE.SphereGeometry(1, 32, 32);
+            const material = new THREE.MeshPhongMaterial({ color: 0xffff00 });
             const sphere = new THREE.Mesh(geometry, material);
             scene.add(sphere);
 
-            // Add ambient light for base visibility
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
             scene.add(ambientLight);
 
-            // Add a point light for shading
-            const light = new THREE.PointLight(0xffffff, 2, 100); // Increased intensity
-            light.position.set(5, 5, 5); // Closer position for better illumination
+            const light = new THREE.PointLight(0xffffff, 2, 100);
+            light.position.set(5, 5, 5);
             scene.add(light);
 
-            // Animation loop
             function animate() {
                 requestAnimationFrame(animate);
-                // Optional: Add rotation for better 3D visualization
                 sphere.rotation.x += 0.01;
                 sphere.rotation.y += 0.01;
                 renderer.render(scene, camera);
@@ -60,7 +74,6 @@
 
             animate();
 
-            // Handle window resize
             window.addEventListener('resize', () => {
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
