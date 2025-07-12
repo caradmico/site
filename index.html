@@ -3,33 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://threejs.org https://cdn.jsdelivr.net https://unpkg.com;">
-    <title>3D Space</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://threejs.org/build/three.min.js"></script>
+    <title>3D Yellow Ball</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
 </head>
 <body>
-    <canvas id="canvas"></canvas>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r162/three.min.js"></script>
     <script>
+        // Create the scene
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas') });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setClearColor(0x000000); // Black background
+        scene.background = new THREE.Color(0x000000); // Black background
 
-        const geometry = new THREE.SphereGeometry(5, 32, 32);
-        const material = new THREE.MeshBasicMaterial({ color: 0xffff00 }); // Yellow ball
+        // Create the camera
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 5; // Position the camera to view the ball
+
+        // Create the renderer
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Create the sphere geometry and material
+        const geometry = new THREE.SphereGeometry(1, 32, 32); // Radius 1, with sufficient segments for smoothness
+        const material = new THREE.MeshPhongMaterial({ color: 0xffff00 }); // Yellow color with Phong shading for 3D effect
+
+        // Create the mesh and add to scene
         const sphere = new THREE.Mesh(geometry, material);
         scene.add(sphere);
 
-        camera.position.z = 15;
+        // Add a point light for shading
+        const light = new THREE.PointLight(0xffffff, 1, 100);
+        light.position.set(10, 10, 10);
+        scene.add(light);
 
+        // Animation loop
         function animate() {
             requestAnimationFrame(animate);
             renderer.render(scene, camera);
         }
+
         animate();
 
+        // Handle window resize
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
