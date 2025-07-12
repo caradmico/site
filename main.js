@@ -11,7 +11,8 @@ const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerH
 camera.position.set(0, 0, 5); // Positioned to center the sphere clearly
 
 const loader = new THREE.TextureLoader();
-const texture = loader.load('https://www.solarsystemscope.com/textures/download/8k_sun.jpg');
+const texture = loader.load('./8k_sun.jpg'); // Local path to avoid CORS issues
+// Attribution: Texture from https://www.solarsystemscope.com/textures/ under CC BY 4.0 license
 
 // Light to enhance surface relief shading
 const light = new THREE.DirectionalLight(0xffffff, 1);
@@ -29,7 +30,6 @@ const sunMaterial = new THREE.MeshStandardMaterial({
   bumpScale: 0.05,
   displacementMap: texture,
   displacementScale: 0.02, // Small scale to avoid excessive distortion
-  emissiveMap: texture,
   emissiveMap: texture,
   emissive: 0xffffff,
   emissiveIntensity: 1.2,
