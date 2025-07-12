@@ -133,7 +133,7 @@ function animate() {
     planet.mesh.position.x = planet.distance * Math.cos(planet.initialAngle + omega * clock.getElapsedTime());
     planet.mesh.position.z = planet.distance * Math.sin(planet.initialAngle + omega * clock.getElapsedTime());
     // Optional: Slow self-rotation for planets
-    planet.mesh.rotation.y += 0.005 * delta;
+    planet.mesh.rotation.y += 0.0005 * delta;
   });
 
   controls.update();
