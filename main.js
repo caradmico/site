@@ -32,7 +32,7 @@ const planetsData = [
 
 const distanceScale = 30; // Units per AU to ensure planets are outside sun and visible
 const sunRadius = 10; // 10x larger than original for visibility
-const speedup = 52596; // Approx factor to make Earth orbit in ~60 real seconds (1 year / 60s)
+const speedup = 1000; // Approx factor to make change speed
 
 // Create sun
 const sunTexture = loader.load('./textures/8k_sun.jpg');
